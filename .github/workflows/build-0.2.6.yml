@@ -1,7 +1,10 @@
-name: Build Sesame-AG 0.2.6 APK
+name: Build Sesame-AG 0.2.7 APK
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-0.2.6.yml"
 
 permissions:
   contents: read
@@ -14,11 +17,11 @@ jobs:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
-      - name: Checkout Sesame-AG 0.2.6 source
+      - name: Checkout Sesame-AG 0.2.7 source
         uses: actions/checkout@v4
         with:
-          repository: Sesame-AG/Sesame-AG
-          ref: 15ffee2c75ad5b7ed55084552401b5e37cfd41f4
+          repository: warthegd/Sesame-AG
+          ref: 7f5aea12a39b6fd274743933099d5157476c727c
           fetch-depth: 0
 
       - name: Set up JDK 17
@@ -32,7 +35,7 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platform-tools" "platforms;android-37" "build-tools;37.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -42,11 +45,11 @@ jobs:
       - name: Build release APKs
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon --stacktrace -PappVersion=0.2.6 -PofficialSigningCertSha256="" assembleRelease
+          ./gradlew --no-daemon --stacktrace -PappVersion=0.2.7 -PofficialSigningCertSha256="" assembleRelease
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: Sesame-AG-0.2.6-APK
+          name: Sesame-AG-0.2.7-APK
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
